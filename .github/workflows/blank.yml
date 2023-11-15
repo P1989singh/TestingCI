@@ -61,7 +61,7 @@ jobs:
             dev.txt
           key: ${{ runner.os }}-text-file-${{ hashFiles('./DB/dev.txt') }}
       - name: Read SIT file
-        run: $(cat ./DB/dev.txt)
+        run: echo "cache1=$(cat ./DB/dev.txt)" >> $GITHUB_ENV
       - name: Check if there are changes in 'DB' directory
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^DB/'; then
