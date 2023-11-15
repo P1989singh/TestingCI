@@ -35,7 +35,7 @@ jobs:
         run: echo Hello, world!
       - name: Read DEV file
         run: |
-          devdata="/DB/dev.txt"
+          devdata="./DB/dev.txt"
           file-content=$(cat $devdata)
           echo "Dev information content $file-content"
       - name: Read SIT file
