@@ -1,27 +1,118 @@
-# This is a basic workflow to help you get started with Actions
+name: 'versioning'
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches:
+    - develop
+    - main
+  push:
+    branches:
+    - develop
+    - main
+    - 'release/**'
+    - 'hotfix/**'
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+env:
+  GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
+  MAIN_BRANCHES: ("develop" "main")
+  GITVERSION_TAG_PROPERTY_PULL_REQUESTS: .SemVer
+  GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
+  GITVERSION_TAG_PROPERTY_DEVELOP: .SemVer
+  GITVERSION_TAG_PROPERTY_RELEASE: .SemVer
+  GITVERSION_TAG_PROPERTY_HOTFIX: .SemVer
+  GITVERSION_TAG_PROPERTY_MAIN: .MajorMinorPatch
+  GITVERSION_REPO_TYPE: SINGLE_APP
+  GITVERSION_CONFIG_SINGLE_APP: '/repo/.cicd/common/.gitversion.yml'
+  GITVERSION_CONFIG_MONOREPO: '/repo/apps/${svc}/.gitversion.yml'
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      # Runs a single command using the runners shell
+  jobs:
+    DEV:
+      runs-on: ubuntu-latest
+  
+      steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Check if there are changes in 'DB' directory
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^DB/'; then
+            echo "Changes found in 'src' directory."
+          else
+            echo "No changes in 'src' directory."
+          fi        
       - name: Run a one-line script
-        run: echo Hello, world!
+        run: echo Hello, world!  
+      - name: Read DEV file
+        uses: ./.cicd/common/gitversion.sh
+        with:
+           
+        run: |
+        devdata="/DB/dev.txt"
+        file-content= $(cat $"devdata")
+        echo Dev information content: "$file-content"
+      - name: Read SIT file
+        run: |
+        devdata1="/DB/sit.txt"
+        file-content1= $(cat $"devdata1")
+        echo SIT Information content: "$file-content1"  
+        
+    SIT:
+      needs: DEV
+      runs-on: ubuntu-latest
+  
+      steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Run a one-line script
+        run: echo Hello, world!    
+      - name: Read SIT file
+        run: |
+        devdata1="/DB/sit.txt"
+        file-content1= $(cat $"devdata1")
+        echo SIT Information content: "$file-content1"
+      - name: Cache Text File
+        uses: actions/cache@v2
+        with:
+          path: |
+            dev.txt
+          key: ${{ runner.os }}-text-file-${{ hashFiles('dev.txt') }}  
+      - name: Read SIT file
+        run: cat dev.txt 
+      - name: Check if there are changes in 'DB' directory
+        uses: ./.cicd/common/gitversion.sh changed
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^DB/'; then
+            echo "Changes found in 'src' directory."
+          else
+            echo "No changes in 'src' directory."
+          fi    
+      - name: Checkout to branch
+        run: . ./.cicd/common/gitversion.sh checkout
+
+      - name: Calculate changed services
+        id: calculate_changed_services
+        run: . ./.cicd/common/gitversion.sh changed
+    
+      - name: Calculate versions
+        id: calculate_service_versions
+        env:
+          SEMVERYEASY_CHANGED: ${{ steps.calculate_changed_services.outputs.changed }}
+          SEMVERYEASY_CHANGED_SERVICES: ${{ fromJSON(steps.calculate_changed_services.outputs.changed_services) }}
+        run: . ./.cicd/common/gitversion.sh calculate-version
+    
+      - name: Update PR description
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          SEMVERY_YEASY_PR_BODY: ${{ fromJSON(steps.calculate_service_versions.outputs.PR_BODY) }}
+        if: ${{ github.event_name == 'pull_request' }}
+        run: . ./.cicd/common/gitversion.sh update-pr
+    
+    
+      - name: Tag build
+        if: ${{ github.event_name == 'push' && (startsWith(steps.calculate_changed_services.outputs.diff_dest, 'release') || startsWith(steps.calculate_changed_services.outputs.diff_dest, 'hotfix') || contains(env.MAIN_BRANCHES, steps.calculate_changed_services.outputs.diff_dest)) }}
+        env:
+          DIFF_DEST: ${{ steps.calculate_changed_services.outputs.DIFF_DEST }}
+          SEMVERYEASY_CHANGED: ${{ steps.calculate_changed_services.outputs.changed }}
+          SEMVERYEASY_CHANGED_SERVICES: ${{ fromJSON(steps.calculate_changed_services.outputs.changed_services) }}
+        run: . ./.cicd/common/gitversion.sh tag
+
+
