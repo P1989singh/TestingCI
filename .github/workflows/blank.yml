@@ -59,9 +59,9 @@ jobs:
         with:
           path: |
             dev.txt
-          key: ${{ runner.os }}-text-file-${{ hashFiles('dev.txt') }}
+          key: ${{ runner.os }}-text-file-${{ hashFiles('./DB/dev.txt') }}
       - name: Read SIT file
-        run: $(cat dev.txt)
+        run: $(cat ./DB/dev.txt)
       - name: Check if there are changes in 'DB' directory
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^DB/'; then
