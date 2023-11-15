@@ -44,14 +44,14 @@ env:
       - name: Read DEV file
         uses: ./.cicd/common/gitversion.sh
         run: |
-        devdata="/DB/dev.txt"
-        file-content= $(cat $"devdata")
-        echo "Dev information content $file-content"
+          devdata="/DB/dev.txt"
+          file-content= $(cat $"devdata")
+          echo "Dev information content $file-content"
       - name: Read SIT file
         run: |
-        devdata1="/DB/sit.txt"
-        file-content1= $(cat $"devdata1")
-        echo "SIT Information content: $file-content1"  
+          devdata1="/DB/sit.txt"
+          file-content1= $(cat $"devdata1")
+          echo "SIT Information content: $file-content1"  
         
     SIT:
       needs: DEV
@@ -64,9 +64,9 @@ env:
         run: echo Hello, world!    
       - name: Read SIT file
         run: |
-        devdata1="/DB/sit.txt"
-        file-content1= $(cat $"devdata1")
-        echo "SIT Information content: $file-content1"
+          devdata1="/DB/sit.txt"
+          file-content1= $(cat $"devdata1")
+          echo "SIT Information content: $file-content1"
       - name: Cache Text File
         uses: actions/cache@v2
         with:
