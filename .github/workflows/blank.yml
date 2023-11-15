@@ -35,14 +35,12 @@ jobs:
         run: echo Hello, world!
       - name: Read DEV file
         run: |
-          devdata="/DB/dev.txt"
-          file-content=$(cat $devdata)
-          echo "Dev information content $file-content"
+          echo "DEV_DATA=$(cat ./DB/dev.txt)" >> $GITHUB_ENV
+          echo "Dev information content $DEV_DATA"
       - name: Read SIT file
         run: |
-          devdata1="/DB/sit.txt"
-          file-content1=$(cat $devdata1)
-          echo "SIT Information content: $file-content1"
+          echo "devdata1=$(cat ./DB/sit.txt)" >> $GITHUB_ENV
+          echo "SIT Information content: $devdata1"
 
   SIT:
     needs: DEV
@@ -54,9 +52,8 @@ jobs:
         run: echo Hello, world!
       - name: Read SIT file
         run: |
-          devdata1="/DB/sit.txt"
-          file-content1=$(cat $devdata1)
-          echo "SIT Information content: $file-content1"
+          echo "devdata2=$(cat ./DB/sit.txt)" >> $GITHUB_ENV
+          echo "SIT Information content: $devdata2"
       - name: Cache Text File
         uses: actions/cache@v2
         with:
@@ -64,7 +61,7 @@ jobs:
             dev.txt
           key: ${{ runner.os }}-text-file-${{ hashFiles('dev.txt') }}
       - name: Read SIT file
-        run: cat dev.txt
+        run: echo "cache1=$(cat ./DB/dev.txt)" >> $GITHUB_ENV
       - name: Check if there are changes in 'DB' directory
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^DB/'; then
