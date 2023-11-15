@@ -73,7 +73,7 @@ jobs:
         run: |
             git fetch --unshallow
             git checkout main && git checkout -
-            git checkout develop && git checkout -
+            git checkout feature && git checkout -
     
       - name: Checkout to branch
         run: . ./.cicd/common/gitversion.sh checkout
@@ -92,7 +92,7 @@ jobs:
     
       - name: Update PR description
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           SEMVERY_YEASY_PR_BODY: ${{ fromJSON(steps.calculate_service_versions.outputs.PR_BODY) }}
         if: ${{ github.event_name == 'pull_request' }}
         run: . ./.cicd/common/gitversion.sh update-pr
