@@ -3,12 +3,14 @@ name: 'versioning'
 on:
   pull_request:
     branches:
-      - develop
+      - feature
       - main
+      - develop
   push:
     branches:
-      - develop
+      - feature
       - main
+      - develop
       - 'release/**'
       - 'hotfix/**'
 
