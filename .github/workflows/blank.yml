@@ -1,5 +1,4 @@
 name: 'versioning'
-
 on:
   pull_request:
     branches:
@@ -11,7 +10,6 @@ on:
     - main
     - 'release/**'
     - 'hotfix/**'
-
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
   MAIN_BRANCHES: ("develop" "main")
@@ -30,14 +28,7 @@ env:
       runs-on: ubuntu-latest
       steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
-      - name: Check if there are changes in 'DB' directory
-        run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^DB/'; then
-            echo "Changes found in 'src' directory."
-          else
-            echo "No changes in 'src' directory."
-          fi        
+        uses: actions/checkout@v2    
       - name: Run a one-line script1
         run: echo Hello, world!  
       - name: Read DEV file
