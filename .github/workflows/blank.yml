@@ -38,7 +38,7 @@ env:
           else
             echo "No changes in 'src' directory."
           fi        
-      - name: Run a one-line script
+      - name: Run a one-line script1
         run: echo Hello, world!  
       - name: Read DEV file
         uses: ./.cicd/common/gitversion.sh
