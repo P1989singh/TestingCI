@@ -39,9 +39,8 @@ jobs:
           echo "Dev information content $DEV_DATA"
       - name: Read SIT file
         run: |
-         echo "devdata1=$(cat ./DB/sit.txt)" >> $GITHUB_ENV
-         echo "SIT Information content: $devdata1"
-
+          echo "devdata1=$(cat ./DB/sit.txt)" >> $GITHUB_ENV
+          echo "SIT Information content: $devdata1"
   SIT:
     needs: DEV
     runs-on: ubuntu-latest
