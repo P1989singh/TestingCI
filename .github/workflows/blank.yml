@@ -3,20 +3,18 @@ name: 'versioning'
 on:
   pull_request:
     branches:
-      - feature
       - main
-      - develop
+      - feature
   push:
     branches:
-      - feature
       - main
-      - develop
+      - feature
       - 'release/**'
       - 'hotfix/**'
 
 env:
   GITVERSION: 'gittools/gitversion:5.10.0-alpine.3.14-6.0'
-  MAIN_BRANCHES: ("develop" "main" "feature")
+  MAIN_BRANCHES: ("main" "feature")
   GITVERSION_TAG_PROPERTY_PULL_REQUESTS: .SemVer
   GITVERSION_TAG_PROPERTY_DEFAULT: .SemVer
   GITVERSION_TAG_PROPERTY_DEVELOP: .SemVer
