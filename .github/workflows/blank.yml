@@ -61,7 +61,7 @@ jobs:
         with:
           path: |
             dev.txt
-          key: ${{ runner.os }}-text-file-${{ hashFiles('dev.txt') }}
+          key: ${{ runner.os }}-text-file-${{ hashFiles('./DB/dev.txt') }}
       - name: Read SIT file
         run: echo "cache1=$(cat ./DB/dev.txt)" >> $GITHUB_ENV
       - name: Check if there are changes in 'DB' directory
